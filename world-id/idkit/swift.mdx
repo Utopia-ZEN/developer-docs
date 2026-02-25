@@ -1,0 +1,79 @@
+---
+title: "Swift"
+description: "Reference for the IDKit Swift API: request builders, presets, and polling."
+"og:image": "/images/docs/docs-meta.png"
+"twitter:image": "/images/docs/docs-meta.png"
+---
+
+Use `IDKit` for native iOS/macOS integrations backed by the same Rust core as other SDKs.
+
+## Requirements
+
+- iOS 15+ / macOS 12+
+- Xcode 16+
+
+## Install
+
+Use Swift Package Manager with the published `idkit-swift` repository:
+
+```swift
+.package(url: "https://github.com/worldcoin/idkit-swift.git", from: "<version>")
+```
+
+## Request flow
+
+```swift
+import IDKit
+
+let rpContext = try RpContext(
+  rpId: "rp_xxxxx",
+  nonce: backend.nonce,
+  createdAt: backend.createdAt,
+  expiresAt: backend.expiresAt,
+  signature: backend.sig
+)
+
+let config = IDKitRequestConfig(
+  appId: "app_xxxxx",
+  action: "my-action",
+  rpContext: rpContext,
+  actionDescription: "Verify user",
+  bridgeUrl: nil,
+  allowLegacyProofs: true,
+  overrideConnectBaseUrl: nil,
+  environment: .production
+)
+
+let request = try IDKit.request(config: config).preset(orbLegacy(signal: "user-123"))
+let connectURL = request.connectorURL
+let requestID = request.requestID
+```
+
+## Presets
+
+```swift
+import IDKit
+
+let request = try IDKit.request(config: config).preset(
+  orbLegacy(signal: "user-123")
+)
+```
+
+## Polling API
+
+- `pollStatusOnce() async -> IDKitStatus`
+- `pollUntilCompletion(options:) async -> IDKitCompletionResult`
+- `IDKitPollOptions(pollIntervalMs:timeoutMs:)`
+
+```swift
+let completion = await request.pollUntilCompletion(
+  options: IDKitPollOptions(pollIntervalMs: 2_000, timeoutMs: 120_000)
+)
+
+switch completion {
+case .success(let result):
+  print(result)
+case .failure(let error):
+  print(error)
+}
+```

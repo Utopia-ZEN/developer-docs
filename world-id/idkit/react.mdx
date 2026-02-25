@@ -1,0 +1,120 @@
+---
+title: "React"
+description: "Reference for @worldcoin/idkit React widgets and hooks, including request flows and presets."
+"og:image": "/images/docs/docs-meta.png"
+"twitter:image": "/images/docs/docs-meta.png"
+---
+
+Use `@worldcoin/idkit` when you want React-native ergonomics on top of `@worldcoin/idkit-core`.
+
+## Install
+
+<CodeGroup>
+```bash npm
+npm i @worldcoin/idkit
+```
+
+```bash pnpm
+pnpm add @worldcoin/idkit
+```
+
+```bash yarn
+yarn add @worldcoin/idkit
+```
+</CodeGroup>
+
+## Choose your API
+
+- **Widgets**: quickest integration, built-in modal and state handling
+- **Hooks**: headless control for custom UI and flow orchestration
+
+## Controlled widgets
+
+### Request widget
+
+```tsx
+import { IDKitRequestWidget, orbLegacy, type RpContext } from "@worldcoin/idkit";
+
+const rpContext: RpContext = {
+  rp_id: "rp_xxxxx",
+  nonce: "0x...",
+  created_at: 1735689600,
+  expires_at: 1735689900,
+  signature: "0x...",
+};
+
+<IDKitRequestWidget
+  open={open}
+  onOpenChange={setOpen}
+  app_id="app_xxxxx"
+  action="my-action"
+  rp_context={rpContext}
+  allow_legacy_proofs={true}
+  preset={orbLegacy({ signal: "user-123" })}
+  environment="production"
+  onSuccess={async (result) => {
+    await fetch("/api/verify-proof", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ rp_id: rpContext.rp_id, devPortalPayload: result }),
+    });
+  }}
+  onError={(errorCode) => {
+    console.error("IDKit error", errorCode);
+  }}
+/>;
+```
+
+## Headless hooks
+
+### `useIDKitRequest`
+
+```tsx
+import { useIDKitRequest, orbLegacy } from "@worldcoin/idkit";
+
+const flow = useIDKitRequest({
+  app_id: "app_xxxxx",
+  action: "my-action",
+  rp_context,
+  allow_legacy_proofs: true,
+  preset: orbLegacy({ signal: "user-123" }),
+  polling: {
+    interval: 2_000,
+    timeout: 120_000,
+  },
+});
+
+<button onClick={flow.open} disabled={flow.isAwaitingUserConfirmation}>
+  Verify
+</button>;
+```
+
+Hook result fields:
+
+- `open()`
+- `reset()`
+- `isAwaitingUserConnection`
+- `isAwaitingUserConfirmation`
+- `isSuccess`
+- `isError`
+- `connectorURI`
+- `result`
+- `errorCode`
+
+## Presets
+
+React hooks/widgets take `preset` directly in config.
+
+## Localization and UX notes
+
+- Widgets support `language="en" | "es" | "th"`
+- Widgets default to `autoClose={true}` after success
+- Host callback exceptions are swallowed to keep the widget state machine stable
+
+## Backend utilities
+
+For RP signature generation in React/Next.js apps, use the pure JS subpath:
+
+```ts
+import { signRequest } from "@worldcoin/idkit/signing";
+```

@@ -1,0 +1,104 @@
+---
+title: "Kotlin"
+description: "Reference for the IDKit Kotlin API: request builders, presets, and polling."
+"og:image": "/images/docs/docs-meta.png"
+"twitter:image": "/images/docs/docs-meta.png"
+---
+
+<Note>
+  The Kotlin SDK is currently under active development. Expect minor API evolution while the SDK hardens.
+</Note>
+
+## Install
+
+The package is published as `com.worldcoin:idkit` to GitHub Packages.
+
+```kotlin
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        maven {
+            url = uri("https://maven.pkg.github.com/worldcoin/idkit")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN") // requires read:packages
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation("com.worldcoin:idkit:<version>")
+}
+```
+
+## Request flow
+
+```kotlin
+import com.worldcoin.idkit.IDKit
+import com.worldcoin.idkit.IDKitPollOptions
+import com.worldcoin.idkit.IDKitCompletionResult
+import com.worldcoin.idkit.orbLegacy
+import uniffi.idkit_core.Environment
+import uniffi.idkit_core.RpContext
+
+val rpContext = RpContext(
+  rpId = "rp_xxxxx",
+  nonce = backend.nonce,
+  createdAt = backend.createdAt.toULong(),
+  expiresAt = backend.expiresAt.toULong(),
+  signature = backend.sig,
+)
+
+val config = IDKitRequestConfig(
+  appId = "app_xxxxx",
+  action = "my-action",
+  rpContext = rpContext,
+  actionDescription = "Verify user",
+  bridgeUrl = null,
+  allowLegacyProofs = true,
+  overrideConnectBaseUrl = null,
+  environment = Environment.PRODUCTION,
+)
+
+val request = IDKit.request(config).preset(orbLegacy(signal = "user-123"))
+val connectorURI = request.connectorURI
+val completion = request.pollUntilCompletion(
+  options = IDKitPollOptions(pollIntervalMs = 2_000u, timeoutMs = 120_000u)
+)
+
+if (completion is IDKitCompletionResult.Success) {
+  val result = completion.result
+}
+```
+
+## Presets
+
+```kotlin
+import com.worldcoin.idkit.IDKit
+import com.worldcoin.idkit.orbLegacy
+
+val request = IDKit.request(config).preset(orbLegacy(signal = "user-123"))
+```
+
+## Polling patterns
+
+- `pollStatusOnce()` for manual loops
+- `pollUntilCompletion(options)` for blocking until terminal state
+- `statusFlow(pollInterval)` extension for coroutine-driven updates
+
+```kotlin
+import com.worldcoin.idkit.IDKitStatus
+import com.worldcoin.idkit.statusFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlin.time.Duration.Companion.seconds
+
+request.statusFlow(2.seconds).collectLatest { status ->
+  when (status) {
+    IDKitStatus.WaitingForConnection -> Unit
+    IDKitStatus.AwaitingConfirmation -> Unit
+    is IDKitStatus.Confirmed -> println(status.result)
+    is IDKitStatus.Failed -> println(status.error)
+  }
+}
+```

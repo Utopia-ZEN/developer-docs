@@ -1,0 +1,170 @@
+---
+title: "On-chain verification"
+description: "Verify World ID proofs directly in Solidity for web3-native flows."
+"og:image": "/images/docs/docs-meta.png"
+"twitter:image": "/images/docs/docs-meta.png"
+---
+
+On-chain verification is best for web3 apps that need proof checks enforced by
+smart contracts (for example gating mints, voting, or claims without backend
+trust assumptions). If you do not need contract-level enforcement, use
+[POST /v4/verify](/api-reference/developer-portal/verify) instead.
+
+## 1. Verifying Legacy proofs (World ID 3.0)
+
+<Warning>
+  If you are integrating World ID on-chain, we strongly recommend deploying your contract behind an upgradable proxy (e.g. UUPS or Transparent Proxy). This allows you to upgrade your verification logic as new World ID versions are released. See the [World ID 4.0 Migration guide](/world-id/4-0-migration) for details.
+</Warning>
+
+For v3 proofs, verify against `WorldIDRouter.verifyProof(...)`. Use the Router address for the chain you're deploying to:
+
+| Chain | `WorldIDRouter` Mainnet | `WorldIDRouter` Testnet |
+|---|---|---|
+| World Chain | [0x17B354dD...A278](https://worldscan.org/address/0x17B354dD2595411ff79041f930e491A4Df39A278) | [0x57f92815...f611](https://sepolia.worldscan.org/address/0x57f928158C3EE7CDad1e4D8642503c4D0201f611) |
+| Ethereum | [id.worldcoin.eth](https://etherscan.io/address/0x163b09b4fe21177c455d850bd815b6d583732432#code) | [0x469449f2...2157](https://sepolia.etherscan.io/address/0x469449f251692e0779667583026b5a1e99512157#code) |
+| Optimism | [optimism.id.worldcoin.eth](https://optimistic.etherscan.io/address/0x57f928158C3EE7CDad1e4D8642503c4D0201f611#code) | [0x11cA3127...4334](https://sepolia-optimism.etherscan.io/address/0x11cA3127182f7583EfC416a8771BD4d11Fae4334#code) |
+| Polygon | [polygon.id.worldcoin.eth](https://polygonscan.com/address/0x515f06B36E6D3b707eAecBdeD18d8B384944c87f#code) | — |
+| Base | [0xBCC7e591...4163](https://basescan.org/address/0xBCC7e5910178AFFEEeBA573ba6903E9869594163#code) | [0x42FF98C4...C02](https://sepolia.basescan.org/address/0x42FF98C4E85212a5D31358ACbFe76a621b50fC02#code) |
+
+```solidity
+interface IWorldID {
+    function verifyProof(
+        uint256 root,
+        uint256 groupId,
+        uint256 signalHash,
+        uint256 nullifierHash,
+        uint256 externalNullifierHash,
+        uint256[8] calldata proof
+    ) external view;
+}
+
+contract VerifyLegacyV3 {
+    IWorldID public immutable worldIdRouter;
+    uint256 public constant GROUP_ID = 1; // Orb
+    mapping(uint256 => bool) public nullifierHashes;
+    error InvalidNullifier();
+
+    constructor(IWorldID _worldIdRouter) {
+        worldIdRouter = _worldIdRouter;
+    }
+
+    function verifyLegacyAndExecute(
+        uint256 root,
+        uint256 signalHash,
+        uint256 nullifierHash,
+        uint256 externalNullifierHash,
+        uint256[8] calldata proof
+    ) external {
+        if (nullifierHashes[nullifierHash]) revert InvalidNullifier();
+
+        worldIdRouter.verifyProof(
+            root,
+            GROUP_ID,
+            signalHash,
+            nullifierHash,
+            externalNullifierHash,
+            proof
+        );
+
+        nullifierHashes[nullifierHash] = true;
+
+        // Execute protected business logic here.
+    }
+}
+```
+
+For legacy proofs, ensure `groupId = 1` (Orb-only on-chain path).
+
+If your v3 proof arrives as ABI-encoded bytes, decode it to `uint256[8]` before
+calling `verifyProof`:
+
+<CodeGroup>
+```ts viem
+import { decodeAbiParameters } from "viem";
+
+const unpackedProof = decodeAbiParameters([{ type: "uint256[8]" }], proof)[0];
+```
+
+```ts ethers.js
+import { defaultAbiCoder as abi } from "@ethersproject/abi";
+
+const unpackedProof = abi.decode(["uint256[8]"], proof)[0];
+```
+</CodeGroup>
+
+## 2. Verifying Uniqueness proofs in `WorldIDVerifier.sol` (World ID 4.0)
+
+<Warning>
+  `WorldIDVerifier` is currently in preview and not yet deployed to mainnet. The interface below may change before release.
+</Warning>
+
+For v4 uniqueness proofs, call `verify(...)` and store used nullifiers to
+enforce one-human-one-action semantics in your contract.
+
+```solidity
+interface IWorldIDVerifier {
+    function verify(
+        uint256 nullifier,
+        uint256 action,
+        uint64 rpId,
+        uint256 nonce,
+        uint256 signalHash,
+        uint64 expiresAtMin,
+        uint64 issuerSchemaId,
+        uint256 credentialGenesisIssuedAtMin,
+        uint256[5] calldata zeroKnowledgeProof
+    ) external view;
+}
+
+contract VerifyUniquenessV4 {
+    IWorldIDVerifier public immutable verifier;
+    mapping(uint256 => bool) public nullifierUsed;
+    error InvalidNullifier();
+
+    constructor(IWorldIDVerifier _verifier) {
+        verifier = _verifier;
+    }
+
+    function verifyAndExecute(
+        uint256 nullifier,
+        uint256 action,
+        uint64 rpId,
+        uint256 nonce,
+        uint256 signalHash,
+        uint64 expiresAtMin,
+        uint64 issuerSchemaId,
+        uint256 credentialGenesisIssuedAtMin,
+        uint256[5] calldata proof
+    ) external {
+        if (nullifierUsed[nullifier]) revert InvalidNullifier();
+
+        verifier.verify(
+            nullifier,
+            action,
+            rpId,
+            nonce,
+            signalHash,
+            expiresAtMin,
+            issuerSchemaId,
+            credentialGenesisIssuedAtMin,
+            proof
+        );
+
+        // Mark nullifier after successful verification (sybil resistance).
+        nullifierUsed[nullifier] = true;
+
+        // Execute protected business logic here.
+    }
+}
+```
+
+Minimal mapping from IDKit result:
+- `nullifier` = `responses[i].nullifier`
+- `action` = `keccak256(action)` as `uint256`
+- `rpId` = numeric `rp_id`
+- `nonce` = top-level `nonce`
+- `signalHash` = `responses[i].signal_hash`
+- `expiresAtMin` = `responses[i].expires_at_min`
+- `issuerSchemaId` = `responses[i].issuer_schema_id`
+- `credentialGenesisIssuedAtMin` = `responses[i].credential_genesis_issued_at_min ?? 0`
+- `proof` = `responses[i].proof` (`uint256[5]`)

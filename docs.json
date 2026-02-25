@@ -83,16 +83,7 @@
           },
           {
             "group": "Technical Reference",
-            "openapi": "openapi/world-miniapps.json",
             "pages": [
-              "mini-apps/reference/api",
-              "POST /api/v2/create-action/{app_id}",
-              "POST /api/v2/minikit/send-notification",
-              "POST /api/v2/verify/{app_id}",
-              "GET /api/v2/minikit/transaction/{transaction_id}",
-              "GET /api/v2/minikit/transaction/debug",
-              "GET /api/v2/minikit/user-grant-cycle",
-              "GET /public/v1/miniapps/prices",
               "mini-apps/reference/errors",
               "mini-apps/reference/address-book",
               "mini-apps/reference/usernames",
@@ -142,27 +133,26 @@
         "tab": "World ID",
         "groups": [
           {
-            "group": "Introduction",
-            "pages": ["world-id/concepts"]
+            "group": "IDKit",
+            "pages": [
+              "world-id/idkit/integrate",
+              "world-id/idkit/onchain-verification",
+              "world-id/idkit/design-guidelines",
+              {
+                "group": "SDK Reference",
+                "pages": [
+                  "world-id/idkit/javascript",
+                  "world-id/idkit/react",
+                  "world-id/idkit/swift",
+                  "world-id/idkit/kotlin",
+                  "world-id/idkit/error-codes"
+                ]
+              }
+            ]
           },
           {
             "group": "Migration",
             "pages": ["world-id/4-0-migration"]
-          },
-          {
-            "group": "ID Kit",
-            "pages": [
-              "world-id/id/getting-started",
-              "world-id/id/web-react",
-              "world-id/id/web-vanilla",
-              "world-id/id/mobile",
-              "world-id/id/cloud",
-              "world-id/id/on-chain",
-              "world-id/id/libraries",
-              "world-id/id/testing",
-              "world-id/id/pitfalls",
-              "world-id/id/design-guidelines"
-            ]
           },
           {
             "group": "Face Check (Beta)",
@@ -174,13 +164,9 @@
             ]
           },
           {
-            "group": "Sign in with World ID",
-            "pages": ["world-id/sign-in/oidc"]
-          },
-          {
             "group": "Technical Reference",
             "pages": [
-              "world-id/reference/idkit",
+              "world-id/concepts",
               "world-id/reference/authenticator",
               {
                 "group": "API References",
@@ -207,14 +193,14 @@
                       "GET /is-valid-root",
                       "GET /status/{id}"
                     ]
+                  },
+                  {
+                    "group": "Issuers",
+                    "pages": ["world-id/reference/poh-issuer"]
                   }
                 ]
               },
-              "world-id/reference/sign-in",
-              "world-id/reference/poh-issuer",
-              "world-id/reference/contracts",
-              "world-id/reference/contract-deployments",
-              "world-id/reference/errors"
+              "world-id/reference/contracts"
             ]
           }
         ]
@@ -281,6 +267,27 @@
           {
             "group": "Further Reading",
             "pages": ["world-chain/resources"]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Developer Portal",
+            "openapi": {
+              "source": "openapi/developer-portal.json",
+              "directory": "api-reference/developer-portal"
+            },
+            "pages": [
+              "POST /api/v4/verify/{rp_id}",
+              "POST /api/v2/verify/{app_id}",
+              "POST /api/v2/minikit/send-notification",
+              "GET /api/v2/minikit/transaction/{transaction_id}",
+              "GET /api/v2/minikit/transaction/debug",
+              "GET /api/v2/minikit/user-grant-cycle",
+              "GET /public/v1/miniapps/prices"
+            ]
           }
         ]
       }
@@ -359,7 +366,7 @@
     },
     {
       "source": "/id/sign-in",
-      "destination": "/world-id/id/sign-in"
+      "destination": "/world-id"
     },
     {
       "source": "/protocol",
@@ -387,7 +394,7 @@
     },
     {
       "source": "/id/anonymous-actions",
-      "destination": "/world-id/id/incognito-actions"
+      "destination": "/world-id/idkit/integrate"
     },
     {
       "source": "/quick-start",
@@ -395,7 +402,7 @@
     },
     {
       "source": "/id/incognito-actions",
-      "destination": "/world-id/id/cloud"
+      "destination": "/world-id/idkit/integrate"
     },
     {
       "source": "/id/idkit",
@@ -407,7 +414,7 @@
     },
     {
       "source": "/api-docs",
-      "destination": "/world-id/reference/api"
+      "destination": "/api-reference/developer-portal/verify"
     },
     {
       "source": "/advanced/zero-knowledge-proofs",
@@ -419,7 +426,7 @@
     },
     {
       "source": "/advanced/on-chain",
-      "destination": "/world-id/id/on-chain"
+      "destination": "/world-id/idkit/onchain-verification"
     },
     {
       "source": "/about/glossary",
@@ -455,15 +462,15 @@
     },
     {
       "source": "/id/cloud",
-      "destination": "/world-id/id/cloud"
+      "destination": "/world-id/idkit/integrate"
     },
     {
       "source": "/id/libraries",
-      "destination": "/world-id/id/libraries"
+      "destination": "/world-id/idkit/integrate"
     },
     {
       "source": "/id/on-chain",
-      "destination": "/world-id/id/on-chain"
+      "destination": "/world-id/idkit/onchain-verification"
     },
     {
       "source": "/idkit/reference",
@@ -483,7 +490,31 @@
     },
     {
       "source": "/reference/api",
-      "destination": "/world-id/reference/api"
+      "destination": "/api-reference/developer-portal/verify"
+    },
+    {
+      "source": "/mini-apps/reference/api",
+      "destination": "/api-reference/developer-portal/verify"
+    },
+    {
+      "source": "/world-id/reference/api",
+      "destination": "/api-reference/developer-portal/verify"
+    },
+    {
+      "source": "/world-id/reference/api-v4",
+      "destination": "/api-reference/developer-portal/verify"
+    },
+    {
+      "source": "/api-reference/developer-portal",
+      "destination": "/api-reference/developer-portal/verify"
+    },
+    {
+      "source": "/api-reference/developer-portal/verify-proof-v4",
+      "destination": "/api-reference/developer-portal/verify"
+    },
+    {
+      "source": "/api-reference/developer-portal/verify-proof",
+      "destination": "/api-reference/developer-portal/verify-legacy"
     },
     {
       "source": "/reference/contracts",
@@ -563,7 +594,7 @@
     },
     {
       "source": "/world-id/id/incognito-actions",
-      "destination": "/world-id/id/cloud"
+      "destination": "/world-id/idkit/integrate"
     },
     {
       "source": "/world-id/id/sign-in",
@@ -575,19 +606,19 @@
     },
     {
       "source": "/world-id/sign-in/pitfalls",
-      "destination": "/world-id/id/pitfalls"
+      "destination": "/world-id/idkit/integrate"
     },
     {
       "source": "/world-id/quick-start/testing",
-      "destination": "/world-id/id/testing"
+      "destination": "/world-id/idkit/integrate"
     },
     {
       "source": "/world-id/quick-start/installation",
-      "destination": "/world-id/id/getting-started"
+      "destination": "/world-id/idkit/integrate"
     },
     {
       "source": "/world-id/quick-start/configuration",
-      "destination": "/world-id/id/getting-started"
+      "destination": "/world-id/idkit/integrate"
     },
     {
       "source": "/world-id/quick-start/templates",
@@ -595,7 +626,11 @@
     },
     {
       "source": "/world-id/reference/address-book",
-      "destination": "/world-id/reference/contract-deployments"
+      "destination": "/world-id/reference/contracts"
+    },
+    {
+      "source": "/world-id/reference/contract-deployments",
+      "destination": "/world-id/reference/contracts"
     },
     {
       "source": "/mini-apps/virality/sharing",
@@ -604,6 +639,54 @@
     {
       "source": "/mini-apps/design/app-guidelines",
       "destination": "/mini-apps/guidelines/app-guidelines"
+    },
+    {
+      "source": "/world-id/reference/idkit",
+      "destination": "/world-id/idkit/integrate"
+    },
+    {
+      "source": "world-id/id/design-guidelines",
+      "destination": "/world-id/idkit/design-guidelines"
+    },
+    {
+      "source": "/world-id/id/getting-started",
+      "destination": "/world-id/idkit/integrate"
+    },
+    {
+      "source": "/world-id/id/web-react",
+      "destination": "/world-id/idkit/react-widget-and-hooks"
+    },
+    {
+      "source": "/world-id/id/web-vanilla",
+      "destination": "/world-id/idkit/integrate"
+    },
+    {
+      "source": "/world-id/id/mobile",
+      "destination": "/world-id/idkit/integrate"
+    },
+    {
+      "source": "/world-id/id/cloud",
+      "destination": "/world-id/idkit/integrate"
+    },
+    {
+      "source": "/world-id/id/on-chain",
+      "destination": "/world-id/idkit/onchain-verification"
+    },
+    {
+      "source": "/world-id/id/libraries",
+      "destination": "/world-id/idkit/integrate"
+    },
+    {
+      "source": "/world-id/id/testing",
+      "destination": "/world-id/idkit/integrate"
+    },
+    {
+      "source": "/world-id/id/pitfalls",
+      "destination": "/world-id/idkit/integrate"
+    },
+    {
+      "source": "/world-id/id/idkit-v4-preview",
+      "destination": "/world-id/idkit/integrate"
     }
   ],
   "api": {

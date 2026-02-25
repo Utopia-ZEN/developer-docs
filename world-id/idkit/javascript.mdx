@@ -1,0 +1,129 @@
+---
+title: "Javascript"
+description: "Reference for `@worldcoin/idkit-core`"
+"og:image": "/images/docs/docs-meta.png"
+"twitter:image": "/images/docs/docs-meta.png"
+---
+
+`@worldcoin/idkit-core` is the lowest-level JavaScript/TypeScript IDKit SDK.
+Use it when you want full control over UI and state management or when you're not using React.
+
+## Install
+
+<CodeGroup>
+```bash npm
+npm i @worldcoin/idkit-core
+```
+
+```bash pnpm
+pnpm add @worldcoin/idkit-core
+```
+
+```bash yarn
+yarn add @worldcoin/idkit-core
+```
+</CodeGroup>
+
+## Entry points
+
+- `IDKit.request(config)` for uniqueness proofs
+- `orbLegacy`, `secureDocumentLegacy`, `documentLegacy` for presets
+
+Each entry point returns a builder. Finalize it with `.preset(...)`.
+
+## Request config
+
+```ts
+import { IDKit } from "@worldcoin/idkit-core";
+
+const builder = IDKit.request({
+  app_id: "app_xxxxx",
+  action: "my-action",
+  rp_context: {
+    rp_id: "rp_xxxxx",
+    nonce: "0x...",
+    created_at: 1735689600,
+    expires_at: 1735689900,
+    signature: "0x...",
+  },
+  action_description: "Verify user",
+  bridge_url: undefined,
+  allow_legacy_proofs: true,
+  override_connect_base_url: undefined,
+  environment: "production",
+});
+```
+
+<Warning>
+  Generate `rp_context` in your backend only. Never expose your RP signing key in client code.
+</Warning>
+
+## Presets
+
+```ts
+import { IDKit, orbLegacy } from "@worldcoin/idkit-core";
+
+const request = await IDKit.request({
+  app_id: "app_xxxxx",
+  action: "my-action",
+  rp_context,
+  allow_legacy_proofs: true,
+}).preset(orbLegacy({ signal: "user-123" }));
+```
+
+## Polling and status
+
+After `.preset(...)`, you get an `IDKitRequest` object:
+
+- `connectorURI`
+- `requestId`
+- `pollOnce()`
+- `pollUntilCompletion({ pollInterval, timeout })`
+
+```ts
+import { IDKitErrorCodes } from "@worldcoin/idkit-core";
+
+const completion = await request.pollUntilCompletion({
+  pollInterval: 2_000,
+  timeout: 120_000,
+});
+
+if (!completion.success) {
+  if (completion.error === IDKitErrorCodes.Timeout) {
+    // UI timeout handling
+  }
+  if (completion.error === IDKitErrorCodes.Cancelled) {
+    // User/app cancellation handling
+  }
+}
+```
+
+<Note>
+  When running inside World App, native transport is used and `connectorURI` may be empty.
+  Outside World App, `connectorURI` is the URL you render as a QR code.
+</Note>
+
+## Server-side helpers
+
+Use subpath exports on your backend:
+
+```ts
+import { signRequest } from "@worldcoin/idkit-core/signing";
+import { hashSignal } from "@worldcoin/idkit-core/hashing";
+
+const { sig, nonce, createdAt, expiresAt } = signRequest(
+  "my-action",
+  process.env.RP_SIGNING_KEY!,
+);
+
+const signalHash = hashSignal("user-123");
+```
+
+`signRequest` should only run in trusted server environments.
+
+## Related pages
+
+- [Getting started](/world-id/idkit/integrate)
+- [React](/world-id/idkit/react)
+- [Error Codes](/world-id/idkit/error-codes)
+- [POST /v4/verify reference](/api-reference/developer-portal/verify)
