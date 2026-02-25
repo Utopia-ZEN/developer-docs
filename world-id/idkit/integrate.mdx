@@ -67,7 +67,7 @@ export async function POST(request: Request): Promise<Response> {
 
 
 # Step 4: Generate the connect URL and collect proof
-
+You can test during development using the [simulator.](https://simulator.worldcoin.org/)
 <CodeGroup title="Create request and collect proof">
 ```typescript title="JavaScript"
 import { IDKit, orbLegacy } from "@worldcoin/idkit-core";
@@ -92,7 +92,7 @@ const request = await IDKit.request({
     signature: rpSig.sig,
   },
   allow_legacy_proofs: true,
-  environment: "production",
+  environment: "production", // Only set this to staging for testing with the simulator
   // Signal (optional): Bind specific context into the requested proof. 
   // Examples: user ID, wallet address. Your backend should enforce the same value.
 }).preset(orbLegacy({ signal: "local-election-1" }));
