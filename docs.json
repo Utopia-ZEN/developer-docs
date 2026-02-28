@@ -33,7 +33,9 @@
         "groups": [
           {
             "group": "Get Started",
-            "pages": ["index"]
+            "pages": [
+              "index"
+            ]
           }
         ]
       },
@@ -42,7 +44,9 @@
         "groups": [
           {
             "group": "Introduction",
-            "pages": ["mini-apps/index"]
+            "pages": [
+              "mini-apps/index"
+            ]
           },
           {
             "group": "Quick Start",
@@ -133,6 +137,12 @@
         "tab": "World ID",
         "groups": [
           {
+            "group": "Overview",
+            "pages": [
+              "world-id/overview"
+            ]
+          },
+          {
             "group": "IDKit",
             "pages": [
               "world-id/idkit/integrate",
@@ -157,12 +167,16 @@
           },
           {
             "group": "Migration",
-            "pages": ["world-id/4-0-migration"]
+            "pages": [
+              "world-id/4-0-migration"
+            ]
           },
           {
             "group": "Selfie Check (Beta)",
             "hidden": true,
-            "pages": ["world-id/selfie-check/overview"]
+            "pages": [
+              "world-id/selfie-check/overview"
+            ]
           },
           {
             "group": "Technical Reference",
@@ -197,7 +211,9 @@
                   },
                   {
                     "group": "Issuers",
-                    "pages": ["world-id/reference/poh-issuer"]
+                    "pages": [
+                      "world-id/reference/poh-issuer"
+                    ]
                   }
                 ]
               },
@@ -267,7 +283,9 @@
           },
           {
             "group": "Further Reading",
-            "pages": ["world-chain/resources"]
+            "pages": [
+              "world-chain/resources"
+            ]
           }
         ]
       },
@@ -351,6 +369,10 @@
   },
   "redirects": [
     {
+      "source": "/world-id",
+      "destination": "/world-id/overview"
+    },
+    {
       "source": "/apps",
       "destination": "https://world.org/apps"
     },
@@ -368,11 +390,11 @@
     },
     {
       "source": "/id",
-      "destination": "/world-id"
+      "destination": "/world-id/overview"
     },
     {
       "source": "/id/sign-in",
-      "destination": "/world-id"
+      "destination": "/world-id/overview"
     },
     {
       "source": "/protocol",
@@ -552,7 +574,7 @@
     },
     {
       "source": "/sign-in",
-      "destination": "/world-id"
+      "destination": "/world-id/overview"
     },
     {
       "source": "/try",
@@ -604,11 +626,11 @@
     },
     {
       "source": "/world-id/id/sign-in",
-      "destination": "/world-id"
+      "destination": "/world-id/overview"
     },
     {
       "source": "/world-id/sign-in",
-      "destination": "/world-id"
+      "destination": "/world-id/overview"
     },
     {
       "source": "/world-id/sign-in/pitfalls",
@@ -716,7 +738,10 @@
       "display": "interactive"
     },
     "examples": {
-      "languages": ["curl", "javascript"],
+      "languages": [
+        "curl",
+        "javascript"
+      ],
       "defaults": "required",
       "prefill": true
     }
