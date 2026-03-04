@@ -33,9 +33,7 @@
         "groups": [
           {
             "group": "Get Started",
-            "pages": [
-              "index"
-            ]
+            "pages": ["index"]
           }
         ]
       },
@@ -44,9 +42,7 @@
         "groups": [
           {
             "group": "Introduction",
-            "pages": [
-              "mini-apps/index"
-            ]
+            "pages": ["mini-apps/index"]
           },
           {
             "group": "Quick Start",
@@ -138,9 +134,7 @@
         "groups": [
           {
             "group": "Overview",
-            "pages": [
-              "world-id/overview"
-            ]
+            "pages": ["world-id/overview"]
           },
           {
             "group": "IDKit",
@@ -156,6 +150,7 @@
                   "world-id/idkit/react",
                   "world-id/idkit/swift",
                   "world-id/idkit/kotlin",
+                  "world-id/idkit/go",
                   "world-id/idkit/error-codes"
                 ]
               }
@@ -167,16 +162,12 @@
           },
           {
             "group": "Migration",
-            "pages": [
-              "world-id/4-0-migration"
-            ]
+            "pages": ["world-id/4-0-migration"]
           },
           {
             "group": "Selfie Check (Beta)",
             "hidden": true,
-            "pages": [
-              "world-id/selfie-check/overview"
-            ]
+            "pages": ["world-id/selfie-check/overview"]
           },
           {
             "group": "Technical Reference",
@@ -211,9 +202,7 @@
                   },
                   {
                     "group": "Issuers",
-                    "pages": [
-                      "world-id/reference/poh-issuer"
-                    ]
+                    "pages": ["world-id/reference/poh-issuer"]
                   }
                 ]
               },
@@ -283,9 +272,7 @@
           },
           {
             "group": "Further Reading",
-            "pages": [
-              "world-chain/resources"
-            ]
+            "pages": ["world-chain/resources"]
           }
         ]
       },
@@ -738,10 +725,7 @@
       "display": "interactive"
     },
     "examples": {
-      "languages": [
-        "curl",
-        "javascript"
-      ],
+      "languages": ["curl", "javascript"],
       "defaults": "required",
       "prefill": true
     }
