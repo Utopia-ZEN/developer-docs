@@ -213,6 +213,18 @@
         ]
       },
       {
+        "tab": "Agents",
+        "groups": [
+          {
+            "group": "Agent Kit",
+            "pages": [
+              "agents/agent-kit/integrate",
+              "agents/agent-kit/sdk-reference"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "World Chain",
         "groups": [
           {
