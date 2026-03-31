@@ -1,60 +1,112 @@
 ---
 title: "Send Haptic Feedback"
+description: "Trigger haptic feedback using the unified MiniKit API."
 "og:image": "https://raw.githubusercontent.com/worldcoin/developer-docs/main/images/docs/docs-meta.png"
 "twitter:image": "https://raw.githubusercontent.com/worldcoin/developer-docs/main/images/docs/docs-meta.png"
 ---
 
-Send Haptic Feedback is our command that lets you create more immersive experiences, by providing tactile feedback to users.
-This command is available from minikit 1.7.1 and World App 2.8.7602 onwards.
-Haptic feedback can improve the user experience by:
+Use `MiniKit.sendHapticFeedback()` to trigger native haptic feedback.
 
--   **Enhancing Responsiveness**: Immediate tactile feedback makes interactions feel faster and more satisfying.
--   **Improving Accessibility**: Haptics can help users with visual impairments by providing an additional layer of feedback.
--   **Increasing Engagement**: Users are more likely to enjoy and continue using apps that feel interactive and responsive.
+## Availability
 
-## Available payloads
+- Works natively in World App
+- Supports a custom fallback outside World App
 
-| hapticsType        | style     | description                                                                       |
-| ------------------ | --------- | --------------------------------------------------------------------------------- |
-| `impact`           | `light`   | Collision between small UI elements.                                              |
-| `impact`           | `medium`  | Collision between medium UI elements.                                             |
-| `impact`           | `heavy`   | Collision between big UI elements.                                                |
-|                    |           |                                                                                   |
-| `notification`     | `success` | Indicates that an action was successful.                                          |
-| `notification`     | `warning` | Indicates that something is not right and user should take notice.                |
-| `notification`     | `error`   | Indicates that an action has failed.                                              |
-|                    |           |                                                                                   |
-| `selectionChanged` | ---       | Informs the user that a selection has changed, for example a checkbox was clicked |
+## Haptic Types
 
-## Creating the payload
+- **`"notification"`** — style: `"success"`, `"warning"`, or `"error"`
+- **`"impact"`** — style: `"light"`, `"medium"`, or `"heavy"`
+- **`"selection-changed"`** — no style needed
 
-```tsx app/page.tsx
-export type SendHapticFeedbackInput = {
-	hapticsType: 'impact'
-	style: 'light'
+## Basic Usage
+
+<CodeGroup>
+```tsx title="Notification"
+import { MiniKit } from "@worldcoin/minikit-js";
+import type {
+  CommandResultByVia,
+  MiniAppSendHapticFeedbackSuccessPayload,
+  MiniKitSendHapticFeedbackOptions,
+} from "@worldcoin/minikit-js/commands";
+
+export async function sendSuccessHaptic() {
+  const input = {
+    hapticsType: "notification",
+    style: "success",
+  } satisfies MiniKitSendHapticFeedbackOptions;
+
+  const result: CommandResultByVia<
+    MiniAppSendHapticFeedbackSuccessPayload,
+    MiniAppSendHapticFeedbackSuccessPayload,
+    "minikit"
+  > = await MiniKit.sendHapticFeedback(input);
+
+  console.log(result.data.timestamp);
 }
 ```
 
-## Using the command
+```tsx title="Impact"
+import { MiniKit } from "@worldcoin/minikit-js";
+import type { MiniKitSendHapticFeedbackOptions } from "@worldcoin/minikit-js/commands";
 
-There's no response from this command.
-
-```tsx app/page.tsx
-import { MiniKit } from '@worldcoin/minikit-js'
-
-const sendHapticFeedbackCommand = () =>
-	MiniKit.commands.sendHapticFeedback({
-		hapticsType: 'impact',
-		style: 'light',
-	})
-
-const ImportantPage = () => {
-	const handleClick = () => {
-		// ...
-		sendHapticFeedbackCommand()
-	}
-	return <button onClick={handleClick}>Click me</button>
+export async function sendImpactHaptic() {
+  await MiniKit.sendHapticFeedback({
+    hapticsType: "impact",
+    style: "medium",
+  } satisfies MiniKitSendHapticFeedbackOptions);
 }
-
-export default ImportantPage
 ```
+
+```tsx title="Selection Changed"
+import { MiniKit } from "@worldcoin/minikit-js";
+import type { MiniKitSendHapticFeedbackOptions } from "@worldcoin/minikit-js/commands";
+
+export async function sendSelectionHaptic() {
+  await MiniKit.sendHapticFeedback({
+    hapticsType: "selection-changed",
+  } satisfies MiniKitSendHapticFeedbackOptions);
+}
+```
+</CodeGroup>
+
+## Result
+
+<CodeGroup>
+```ts title="Type"
+type SendHapticFeedbackResponse =
+  | {
+      executedWith: "minikit";
+      data: {
+        status: "success";
+        version: number;
+        timestamp: string;
+      };
+    }
+  | {
+      executedWith: "fallback";
+      data: unknown;
+    };
+```
+
+```json title="Example"
+{
+  "executedWith": "minikit",
+  "data": {
+    "status": "success",
+    "version": 1,
+    "timestamp": "2026-03-28T18:24:00.000Z"
+  }
+}
+```
+</CodeGroup>
+
+## Fallback Behavior
+
+Use a custom `fallback` if you want equivalent haptic behavior outside World App.
+
+## Error Codes
+
+| Code | Meaning |
+| --- | --- |
+| `generic_error` | Unexpected failure |
+| `user_rejected` | The request was rejected |
